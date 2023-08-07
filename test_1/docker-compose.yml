@@ -1,0 +1,38 @@
+version: '3'
+
+volumes:
+  my_shared_volume:
+    driver: local
+    
+services:
+  frontend:
+      build:
+        context: /frontend
+        dockerfile: Dockerfile
+      ports:
+        - 80:80
+      # depends_on:
+      #   - backend
+      # profiles: ["front"]
+      volumes:
+      - my_shared_volume:/app
+
+  backend:
+    build:
+      context: /backend
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    volumes:
+      - my_shared_volume:/app
+    depends_on:
+      - database
+    # profiles:
+    #   - debug
+        
+  database:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
